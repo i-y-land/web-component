@@ -1,0 +1,119 @@
+<style>
+  :host {
+    display: inline-block;
+    outline: none;
+    width: 48px;
+  }
+
+  :host(:active) ellipse.clickable {
+    fill: #F7F7FC;
+    stroke: #610BEF;
+  }
+
+  :host(:hover) .clickable {
+    fill: #F7F7FC;
+    stroke: #D9DBE9;
+  }
+
+  :host(:focus) ellipse.focus {
+    visibility: visible;
+  }
+
+  ellipse, text, line {
+    -webkit-touch-callout: none;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    pointer-events: none;
+  }
+
+  ellipse.clickable {
+    pointer-events: auto;
+  }
+
+  text {
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  ellipse.focus {
+    opacity: 0.5;
+    visibility: hidden;
+  }
+</style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 134">
+  <ellipse
+      class="focus"
+      cx="24"
+      cy="24"
+      fill="#BFBEFC"
+      rx="22"
+      ry="22"
+  />
+  <ellipse
+      class="add clickable"
+      cx="24"
+      cy="24"
+      fill="#EFF0F6"
+      stroke="#EFF0F6"
+      stroke-width="2"
+      rx="14"
+      ry="14"
+  />
+  <line
+      class="icon"
+      stroke="#14142B"
+      stroke-linecap="round"
+      stroke-width="2"
+      x1="20"
+      x2="28"
+      y1="24"
+      y2="24"
+  />
+  <line
+      class="icon"
+      stroke="#14142B"
+      stroke-linecap="round"
+      stroke-width="2"
+      x1="24"
+      x2="24"
+      y1="20"
+      y2="28"
+  />
+  <text
+      class="number"
+      dominant-baseline="middle"
+      text-anchor="middle"
+      x="24"
+      y="63"
+  >0</text>
+  <ellipse
+      class="focus"
+      cx="24"
+      cy="102"
+      fill="#BFBEFC"
+      rx="22"
+      ry="22"
+  />
+  <ellipse
+      class="subtract clickable"
+      cx="24"
+      cy="102"
+      fill="#EFF0F6"
+      stroke="#EFF0F6"
+      stroke-width="2"
+      rx="14"
+      ry="14"
+  />
+  <line
+      class="icon"
+      stroke="#14142B"
+      stroke-linecap="round"
+      stroke-width="2"
+      x1="20"
+      x2="28"
+      y1="102"
+      y2="102"
+  />
+</svg>

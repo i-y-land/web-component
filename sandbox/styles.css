@@ -1,0 +1,74 @@
+html, body {
+  font-family: "Fira Sans", sans-serif;
+  margin: 42px;
+}
+
+button.--action {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+}
+
+section {
+  margin: 40px auto;
+  max-width: 1000px;
+  width: 100%;
+}
+
+input {
+  background-color: #EFF0F7;
+  box-sizing: border-box;
+  border: 0.125rem solid transparent;
+  border-radius: 16px;
+  color: #6E7191;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 0.9375rem;
+  height: 56px;
+  line-height: 1.5rem;
+  max-width: 325px;
+  padding: 16px 24px;
+  outline: none;
+}
+
+label {
+  position: relative;
+}
+
+label:focus-within {
+  color: red;
+}
+
+label > span {
+  color: #6E7191;
+  font-size: 0.8125rem;
+  position: absolute;
+  top: 10px;
+  left: 26px;
+}
+
+label > input {
+  color: #14142B;
+  padding: 28px 24px 8px 23px;
+}
+
+input:focus {
+  border-color: #14142B;
+  background-color: #FCFCFC;
+  color: #14142B;
+}
+
+.sandbox {
+  align-items: center;
+  display: flex;
+}
+
+.sandbox > aside {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+}

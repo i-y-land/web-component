@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Web Component: Sandbox</title>
+</head>
+<body>
+  <section>
+    <h2>Stepper</h2>
+    <div class="sandbox">
+      <iy-stepper value="24"></iy-stepper>
+    </div>
+    <div id="stepper-test" class="tests"></div>
+    <script src="./stepper/stepper.js" type="module" defer></script>
+    <script type="module">
+      import("./stepper/stepper_test.js")
+        .then(({ runTests }) => {
+          runTests(window.document.querySelector("#stepper-test"));
+        }, e => console.error(e));
+    </script>
+  </section>
+  <section>
+    <h2>Slider</h2>
+    <div class="sandbox">
+      <iy-slider value="0.5"></iy-slider>
+    </div>
+    <div id="slider-test" class="tests"></div>
+    <script src="./slider/slider.js" type="module" defer></script>
+    <script type="module">
+      import("./slider/slider_test.js")
+        .then(({ runTests }) => {
+          runTests(window.document.querySelector("#slider-test"));
+        }, e => console.error(e));
+    </script>
+  </section>
+  <script defer>
+    window.addEventListener("load", () => {
+      const sandboxes = window.document.querySelectorAll("section > .sandbox");
+
+      for (const sandbox of sandboxes) {
+        const e = sandbox.firstElementChild;
+        const attributes = e.constructor.observedAttributes || [];
+
+        if (attributes.length === 0) break;
+
+        const wrapper = window.document.createElement("aside");
+        sandbox.appendChild(wrapper);
+
+        for (const attribute of attributes) {
+          const label = window.document.createElement("label");
+          label.for = `control_${attribute}`;
+          const span = window.document.createElement("span");
+          span.textContent = attribute;
+          const input = window.document.createElement("input");
+          input.name = `control_${attribute}`;
+          input.value = e.getAttribute(attribute);
+
+          label.appendChild(span);
+          label.appendChild(input);
+          wrapper.appendChild(label);
+
+          input.addEventListener("change", () => {
+            e.setAttribute(attribute, input.value);
+          });
+
+          const observer = new MutationObserver(
+            (ms) => ms.forEach(({ attributeName, target }) => {
+              if (attributeName !== attribute) return;
+              const value = target.getAttribute(attributeName);
+              if (input.value !== value) input.value = value;
+            })
+          );
+
+          observer.observe(e, { attributes: true });
+        }
+      }
+    });
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</body>
+</html>

@@ -1,0 +1,151 @@
+<style>
+  :host {
+    box-sizing: border-box;
+    display: block;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: 1.375rem;
+    margin: 10px 0;
+    min-height: 36px;
+  }
+
+  :host(.--expanded) {
+    height: auto;
+  }
+
+  :host(.--expanded) .sandbox {
+    height: auto;
+    max-height: 300px;
+    min-height: 250px;
+    overflow: paged-y;
+    padding: 24px;
+  }
+
+  :host(.--expanded) .expand__vertical-stroke {
+    display: none;
+  }
+
+  button {
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    display: flex;
+    height: 18px;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    width: 18px;
+  }
+
+  button > svg {
+    height: 100%;
+    width: 100%;
+  }
+
+  .row {
+    border-bottom: 1px solid #D9DBE9;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: auto 25% 24px;
+    column-gap: 24px;
+    padding: 10px 0;
+  }
+
+  .row > div {
+    align-items: center;
+    display: flex;
+  }
+
+  .status > svg {
+    height: 16px;
+    margin-right: 16px;
+    width: 16px;
+  }
+
+  .status > svg ellipse {
+    fill: #000;
+  }
+
+  :host([status="succeeded"]) .status > svg ellipse {
+    fill: #067306;
+  }
+
+  :host([status="failed"]) .status > svg ellipse {
+    fill: #CA024F;
+  }
+
+  .sandbox {
+    background-color: #F7F7FC;
+    box-sizing: border-box;
+    height: 0;
+    overflow: hidden;
+    position: relative;
+    transition: height 3s;
+  }
+
+  .sandbox .time {
+    bottom: 24px;
+    font-size: 0.8125rem;
+    position: absolute;
+    right: 24px;
+  }
+
+  :host([data-results="slow"]) .sandbox .time {
+    color: #EE6D00;
+  }
+
+  :host([data-results="very-slow"]) .sandbox .time {
+    color: #E61B00;
+  }
+
+  .toast {
+    background-color: #FFECFC;
+    border-radius: 12px;
+    color: #9E0038;
+    display: none;
+    min-width: 327px;
+    padding: 24px;
+    position: absolute;
+    right: 24px;
+    top: 24px;
+  }
+
+  .toast.--visible {
+    display: block;
+  }
+
+  .toast__title, .toast__message {
+    display: block;
+  }
+
+  .toast__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 2rem;
+  }
+</style>
+<div class="row">
+  <div class="title"></div>
+  <div class="status">
+    <svg viewBox="0 0 16 16">
+      <ellipse cx="8" cy="8" rx="4" ry="4" />
+    </svg>
+    <span>Running</span>
+  </div>
+  <div class="actions">
+    <button name="expand">
+      <svg viewBox="0 0 24 24">
+        <line class="expand__vertical-stroke" stroke="#610BEF" stroke-width="2" x1="12" y1="4" x2="12" y2="20" />
+        <line class="expand__horizontal-stroke" stroke="#610BEF" stroke-width="2" x1="4" y1="12" x2="20" y2="12" />
+      </svg>
+    </button>
+  </div>
+</div>
+<div class="sandbox">
+  <div class="toast">
+    <strong class="toast__title">Error message</strong>
+    <span class="toast__message">Error message</span>
+  </div>
+  <div class="time">Running...</div>
+</div>

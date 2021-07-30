@@ -1,0 +1,67 @@
+<style>
+  :host {
+    display: inline-block;
+    height: 48px;
+    outline: none;
+  }
+  :host(:hover) rect.active-track {
+    fill: #4700AB;
+  }
+  :host(:hover) ellipse.thumb {
+    stroke: #4700AB;
+  }
+  :host(:hover) line.notch {
+    stroke: #4700AB;
+  }
+  :host(:focus) ellipse.thumb-outer {
+    visibility: visible;
+  }
+  :host([disabled]) {
+    opacity: 0.5;
+  }
+  svg {
+    height: 48px;
+  }
+  svg * {
+    pointer-events: none;
+  }
+  svg .clickable {
+    pointer-events: auto;
+  }
+  ellipse.thumb-outer {
+    opacity: 0.5;
+    visibility: hidden;
+  }
+</style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 294 48">
+  <rect class="runnable-track clickable" fill="#D9DBE9" height="12" width="278" rx="6" x="8" y="18" />
+  <rect class="active-track" fill="#610BEF" height="12" width="166" rx="6" x="8" y="18" />
+  <ellipse
+      class="thumb-outer"
+      cx="166"
+      cy="24"
+      fill="#BFBEFC"
+      rx="24"
+      ry="24"
+  />
+  <ellipse
+      class="thumb clickable"
+      cx="166"
+      cy="24"
+      fill="#FCFCFC"
+      stroke="#610BEF"
+      stroke-width="2"
+      rx="14"
+      ry="14"
+  />
+  <line
+      class="notch"
+      stroke="#610BEF"
+      stroke-linecap="round"
+      stroke-width="2"
+      x1="166"
+      x2="166"
+      y1="20"
+      y2="28"
+  />
+</svg>
