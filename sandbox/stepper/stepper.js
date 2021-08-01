@@ -9,8 +9,8 @@ const observer = new MutationObserver(
     }),
 );
 
-export const attributeChangedCallback = (_, w, v) =>
-  (v !== "" && typeof Number(v) === "number") && v >= 0 && w !== v;
+export const attributeChangedCallback = ({ oldValue, value }) =>
+  value >= 0 && oldValue !== value && ({ value: value });
 
 const connectedCallback = (element, render) => {
   element._handleAddButtonClick = render((_, { value }) => ({

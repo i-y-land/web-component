@@ -10,11 +10,11 @@
     min-height: 36px;
   }
 
-  :host(.--expanded) {
+  :host([data-expanded="true"]) {
     height: auto;
   }
 
-  :host(.--expanded) .sandbox {
+  :host([data-expanded="true"]) .sandbox {
     height: auto;
     max-height: 300px;
     min-height: 250px;
@@ -22,7 +22,7 @@
     padding: 24px;
   }
 
-  :host(.--expanded) .expand__vertical-stroke {
+  :host([data-expanded="true"]) .expand__vertical-stroke {
     display: none;
   }
 
@@ -67,11 +67,11 @@
     fill: #000;
   }
 
-  :host([status="succeeded"]) .status > svg ellipse {
+  :host([data-status="succeeded"]) .status > svg ellipse {
     fill: #067306;
   }
 
-  :host([status="failed"]) .status > svg ellipse {
+  :host([data-status="failed"]) .status > svg ellipse {
     fill: #CA024F;
   }
 

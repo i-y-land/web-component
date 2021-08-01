@@ -63,9 +63,15 @@ input:focus {
 }
 
 .sandbox > aside {
+  align-items: flex-end;
   display: flex;
+  flex-direction: column;
   flex-grow: 1;
-  justify-content: flex-end;
+  justify-content: center;
+}
+
+.sandbox > aside label {
+  margin: 8px 0;
 }
 
 label {

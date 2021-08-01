@@ -1,33 +1,13 @@
 import { deferUntil, deferUntilNextFrame } from "../../library/component.js";
-import { assert, assertWhen, renderTests, test } from "../../library/test.js";
+import { assert, renderTests, test } from "../../library/test.js";
 import { calculatePosition } from "./slider.js";
 
 export const runTests = renderTests(
   test(
-    "The component attribute value takes precedence",
-    (root) =>
-      Promise.all(
-        [[0.2, 55], [0.4, 111], [0.8, 222]]
-          .map(([v, cx]) => {
-            const e = window.document.createElement("iy-slider");
-            e.setAttribute("value", String(v));
-            root.appendChild(e);
-
-            return assertWhen(
-              () => e.isAsyncConnected,
-              () =>
-                e.shadowRoot.querySelector("ellipse.thumb").getAttribute(
-                  "cx",
-                ) === String(cx),
-            );
-          }),
-      ),
-  ),
-  test(
     "Setting the value key updates the position of the thumb",
     (root) => {
       const e = window.document.createElement("iy-slider");
-      e.value = 0.4;
+      e.value = 40;
 
       root.appendChild(e);
 
@@ -36,7 +16,7 @@ export const runTests = renderTests(
           const x1 = Number(
             e.shadowRoot.querySelector(".thumb").getAttribute("cx"),
           );
-          e.value = 0.8;
+          e.value = 80;
 
           return deferUntilNextFrame()
             .then(deferUntilNextFrame)
@@ -45,7 +25,7 @@ export const runTests = renderTests(
                 e.shadowRoot.querySelector(".thumb").getAttribute("cx"),
               );
 
-              return assert(
+              assert(
                 x1 !== x2,
                 `The value should be different: x1 (${x1}) x2 (${x2}`,
               );
@@ -54,13 +34,42 @@ export const runTests = renderTests(
     },
   ),
   test(
+    "If I set the attribute, the component's dispatch a `change` event",
+    (root) => {
+      const e = window.document.createElement("iy-slider");
+      e.setAttribute("value", String(42));
+      root.appendChild(e);
+
+      return deferUntil(e, (e) => e.isAsyncConnected)
+        .then(() =>
+          new Promise((resolve, reject) => {
+            const t = setTimeout(
+              () => reject(new Error("Timed out")),
+              1000 * 5,
+            );
+            e.addEventListener("change", () => {
+              clearTimeout(t);
+              resolve();
+            });
+            e.setAttribute("value", String(80));;
+          })
+        );
+    },
+  ),
+  test(
     "calculatePosition",
     () => {
-      return assert(
+      assert(
         calculatePosition(
-          0.5,
-          { offset: 32, radius: 14, width: 277 },
-        ) === 138,
+          50,
+          {
+            max: 100,
+            min: 0,
+            offset: 32,
+            radius: 14,
+            width: 277
+          },
+        ) === 137,
       );
     },
   ),

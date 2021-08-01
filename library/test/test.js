@@ -8,13 +8,12 @@ const dictionary = {
   "succeeded": "Succeeded",
 };
 
-export const attributeChangedCallback = (name, w, v) =>
-  !!v &&
-  (
-    (name === "expanded" && ["true", "false", "1", "0"].includes(v)) ||
-    (name === "status" && statuses.includes(v) && w !== v) ||
-    (name === "message")
-  );
+export const attributeChangedCallback = ({ name, oldValue, value }) => (
+  ((name === "data-expanded") && ({ expanded: value })) ||
+  ((name === "data-status" && statuses.includes(value) && oldValue !== value) &&
+    ({ status: value })) ||
+  ((name === "data-message") && ({ message: value }))
+);
 
 const connectedCallback = (element, render) => {
   element._expandButtonClick = render((_, { expanded }) => ({
@@ -51,7 +50,7 @@ const extend = (Component) => {
           return this[StateSymbol].expanded;
         },
         set(x) {
-          this.setAttribute("expanded", x);
+          this.dataset.expanded = x;
         },
       },
       "status": {
@@ -61,7 +60,7 @@ const extend = (Component) => {
         },
         set(x) {
           if (statuses.includes(x)) {
-            this.setAttribute("status", x);
+            this.dataset.status = x;
           }
         },
       },
@@ -71,20 +70,33 @@ const extend = (Component) => {
           return this[StateSymbol].test;
         },
         set(f) {
-          this.setAttribute("status", "running");
+          this.dataset.status = "running";
           const t = Date.now();
 
-          Promise.resolve(f(this.elements.sandbox))
+          new Promise((resolve, reject) => {
+            try {
+              const r = f(this.elements.sandbox);
+
+              if (r instanceof Promise) {
+                r.then(resolve, reject);
+              } else {
+                resolve(r);
+              }
+            } catch (e) {
+              reject(e);
+            }
+          })
             .then(
               () => {
                 this.dataset.runTime = String(Date.now() - t);
-                this.setAttribute("status", "succeeded");
+                this.dataset.status = "succeeded";
               },
               (e) => {
                 this.dataset.runTime = String(Date.now() - t);
-                this.setAttribute("status", "failed");
-                this.setAttribute("message", e.message);
+                this.dataset.status = "failed";
+                this.dataset.message = e.message;
                 this.dataset.meta = e;
+                console.error(this.dataset.meta);
               },
             );
         },
@@ -94,14 +106,8 @@ const extend = (Component) => {
   return Component;
 };
 
-export const render = (e, { expanded, message, status }) => {
+export const render = (e, { message, status }) => {
   const { titleText, sandbox, statusText, toast } = e.elements;
-
-  if (expanded && !e.classList.contains("--expanded")) {
-    e.classList.add("--expanded");
-  } else if (!expanded && e.classList.contains("--expanded")) {
-    e.classList.remove("--expanded");
-  }
 
   statusText.children[1].textContent = dictionary[status];
 
@@ -119,10 +125,6 @@ export const render = (e, { expanded, message, status }) => {
       ? `${message}\n${e.dataset.meta}`
       : message;
   }
-
-  if (e.dataset.meta) {
-    console.error(e.dataset.meta);
-  }
 };
 
 export const Test = createComponent(
@@ -135,10 +137,10 @@ export const Test = createComponent(
     elements,
     extend,
     mapAttributeToState: {
-      expanded: (v) =>
+      "data-expanded": (v) =>
         (typeof v === "string") ? !["false", "0"].includes(v) : !!v,
     },
-    observedAttributes: ["expanded", "message", "status"],
+    observedAttributes: ["data-expanded", "data-message", "data-status"],
     state: { expanded: false, message: null, status: "idle", test: null },
     templatePath: import.meta.url.replace("test.js", "test.html"),
   },

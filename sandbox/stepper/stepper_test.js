@@ -1,57 +1,8 @@
 import { deferUntil } from "../../library/component.js";
-import { assertWhen, renderTests, test } from "../../library/test.js";
-import "./stepper.js";
+import { assert, assertEquals, assertWhen, renderTests, test } from "../../library/test.js";
+import { attributeChangedCallback } from "./stepper.js";
 
 export const runTests = renderTests(
-  test(
-    "The component attribute value takes precedence",
-    (root) =>
-      Promise.all(
-        [42, 24, 12]
-          .map((v) => {
-            const e = window.document.createElement("iy-stepper");
-            e.setAttribute("value", String(v));
-            root.appendChild(e);
-
-            return assertWhen(
-              () => e.isAsyncConnected,
-              () =>
-                e.shadowRoot.querySelector("text.number").textContent ===
-                  String(v),
-            );
-          }),
-      ),
-  ),
-  test(
-    "If I set the atttribute, the component is rendered",
-    (root) => {
-      const e = window.document.createElement("iy-stepper");
-      e.setAttribute("value", String(42));
-      root.appendChild(e);
-      e.setAttribute("value", String(24));
-
-      return assertWhen(
-        () => e.isAsyncConnected,
-        () => e.shadowRoot.querySelector("text.number").textContent === "24",
-      );
-    },
-  ),
-  test(
-    "If I set the value, the component's attribute is updated and the component is rendered",
-    (root) => {
-      const e = window.document.createElement("iy-stepper");
-      e.setAttribute("value", String(42));
-      root.appendChild(e);
-      e.value = 12;
-
-      return assertWhen(
-        () => e.isAsyncConnected,
-        () =>
-          e.shadowRoot.querySelector("text.number").textContent === "12" &&
-          e.value === 12,
-      );
-    },
-  ),
   test(
     "If I click on the `clickable` ellipse, the component's is rendered",
     (root) => {
@@ -75,7 +26,7 @@ export const runTests = renderTests(
     },
   ),
   test(
-    "If I set the `value` to an empty string, the component's is not rendered",
+    "If I set the `value` to an empty string, the value is 0",
     (root) => {
       const e = window.document.createElement("iy-stepper");
       e.setAttribute("value", String(42));
@@ -87,14 +38,15 @@ export const runTests = renderTests(
           return assertWhen(
             () => e.isAsyncConnected,
             () =>
-              e.shadowRoot.querySelector("text.number").textContent === "42" &&
-              e.value === 42,
+              e.shadowRoot.querySelector("text.number").textContent === "0" &&
+              e.value === 0,
+            `The value was changed to ${e.value}`
           );
         });
     },
   ),
   test(
-    "If I set the attribute, the component's dispatch an event",
+    "If I set the attribute, the component's dispatch a `change` event",
     (root) => {
       const e = window.document.createElement("iy-stepper");
       e.setAttribute("value", String(42));
@@ -118,4 +70,15 @@ export const runTests = renderTests(
         );
     },
   ),
+  test(
+    "attributeChangedCallback",
+    () => {
+      assertEquals(
+        attributeChangedCallback({ oldValue: 0, value: 1 }),
+        { value: 1 }
+      );
+      assert(!attributeChangedCallback({ oldValue: 1, value: 1 }));
+      assert(!attributeChangedCallback({ oldValue: 1, value: -1 }));
+    }
+  )
 );

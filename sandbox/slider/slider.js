@@ -1,12 +1,10 @@
 import { createComponent } from "../../library/component.js";
 
-export const calculatePosition = (value, { offset, radius, width }) => {
-  const ratio = Math.floor(width * value);
-
-  return value < 0.09
-    ? Math.max(ratio, radius)
-    : Math.min(width - (radius - offset), ratio);
-};
+export const calculatePosition = (value, { max, min, offset, radius, width }) =>
+  Math.max(
+    Math.floor(((value - min) * width) / (max - min + 1)),
+    radius
+  );
 
 export const positionThumb = (x, { thumb, thumbOuter, notch }) => {
   const v = Number(thumb.getAttribute("cx"));
@@ -32,35 +30,41 @@ const observer = new MutationObserver(
 );
 
 export const attributeChangedCallback = (
+  { name, oldValue, value },
   _,
-  w,
-  v,
-) => (w >= 0 && w <= 1 && v !== w);
+  { max, min }
+) => {
+  if (name === "value") {
+    if (value >= min && value <= max) {
+      return { value };
+    } else {
+      return { value: oldValue };
+    }
+  }
+};
 
 const connectedCallback = (element, render) => {
-  element._handleMouseMove = render((e, _, { clientX }) => {
+  element._handleMouseMove = render((e, { max, min }, { clientX }) => {
     if (e.dataset.drag !== "true") return;
     const { track } = e.elements;
     const box = track.getBoundingClientRect();
     const r = (clientX - box.x) / box.width;
 
-    return { value: r < 0 ? 0 : r > 1 ? 1 : r };
+    return {
+      value: r < 0 ? min : r > 1 ? max : Math.floor(r * (max - min + 1) + min)
+    };
   });
   element._handleMouseUp = render((e) => {
     e._dragElement = null;
     e.dataset.drag = "false";
     document.removeEventListener("mouseup", e._handleMouseUp);
     document.removeEventListener("mousemove", e._handleMouseMove);
-
-    return {};
   });
   element._handleMouseDown = render((e, _, { target }) => {
     e._dragElement = target;
     e.dataset.drag = "true";
     document.addEventListener("mouseup", e._handleMouseUp);
     document.addEventListener("mousemove", e._handleMouseMove);
-
-    return {};
   });
 
   observer.observe(element, { attributes: true });
@@ -89,26 +93,49 @@ const elements = {
 };
 
 const extend = (Component) => {
-  Object.defineProperty(
+  Object.defineProperties(
     Component.prototype,
-    "value",
     {
-      enumerable: true,
-      get() {
-        return this.state.value;
+      max: {
+        enumerable: true,
+        get() {
+          return this.state.max;
+        },
+        set(x) {
+          if (!this.hasAttribute("disabled")) {
+            this.setAttribute("max", x);
+          }
+        },
       },
-      set(x) {
-        if (!this.hasAttribute("disabled")) {
-          this.setAttribute("value", x);
-        }
+      min: {
+        enumerable: true,
+        get() {
+          return this.state.min;
+        },
+        set(x) {
+          if (!this.hasAttribute("disabled")) {
+            this.setAttribute("min", x);
+          }
+        },
       },
+      value: {
+        enumerable: true,
+        get() {
+          return this.state.value;
+        },
+        set(x) {
+          if (!this.hasAttribute("disabled")) {
+            this.setAttribute("value", x);
+          }
+        },
+      }
     },
   );
 
   return Component;
 };
 
-export const render = (e, { value }) => {
+export const render = (e, { max, min, value }) => {
   if (!e.parentElement) return;
 
   const { activeTrack, track } = e.elements;
@@ -123,7 +150,13 @@ export const render = (e, { value }) => {
   const radius = Number(thumbOuter.getAttribute("rx"));
   const x = calculatePosition(
     value,
-    { offset, radius, width: box.width },
+    {
+      max,
+      min,
+      offset,
+      radius,
+      width: box.width
+    },
   );
   window.requestAnimationFrame(() => {
     positionActiveTrack(radius - offset, x, activeTrack);
@@ -148,10 +181,12 @@ export const Slider = createComponent(
     elements,
     extend,
     mapAttributeToState: {
+      max: Number,
+      min: Number,
       value: Number,
     },
-    observedAttributes: ["value"],
-    state: { value: "0" },
+    observedAttributes: ["max", "min", "value"],
+    state: { max: 100, min: 0, value: 0 },
     templatePath: "./slider/slider.html",
   },
 );

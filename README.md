@@ -22,9 +22,9 @@ const observer = new MutationObserver(
     }),
 );
 
-// Predicate to decide if the component should be rendered
-export const attributeChangedCallback = (_, w, v) =>
-  (v !== "" && typeof Number(v) === "number") && v >= 0 && w !== v;
+// Set the state for the next render
+export const attributeChangedCallback = ({ oldValue, value }) =>
+  value >= 0 && oldValue !== value && ({ value: value });
 
 const connectedCallback = (element, render) => {
   element._handleAddButtonClick = render((_, { value }) => ({
@@ -101,14 +101,11 @@ export const Stepper = createComponent(
     disconnectedCallback,
     elements,
     extend,
-    // Convenience utility to coerce attributes to the state
     mapAttributeToState: {
       value: Number,
     },
-    // List of attributes that will trigger a render
     observedAttributes: ["value"],
     state: { value: 0 },
-    // Template will be fetched, cached and attached to the component's shadow root
     templatePath: "./stepper/stepper.html",
   },
 );
@@ -135,25 +132,26 @@ import "./stepper.js";
 
 export const runTests = renderTests(
   test(
-    "The component attribute value takes precedence",
-    (root) =>
-      Promise.all(
-        [42, 24, 12]
-          .map((v) => {
-            // Create 3 components
-            const e = window.document.createElement("iy-stepper");
-            e.setAttribute("value", String(v));
-            root.appendChild(e);
+    "If I click on the `clickable` ellipse, the component's is rendered",
+    (root) => {
+      const e = window.document.createElement("iy-stepper");
+      e.setAttribute("value", String(42));
+      root.appendChild(e);
 
-            // Wait for the component to be correctly attached and make assertions
-            return assertWhen(
-              () => e.isAsyncConnected,
-              () =>
-                e.shadowRoot.querySelector("text.number").textContent ===
-                String(v),
-            );
-          }),
-      ),
+      return new Promise((resolve) => setTimeout(resolve, 500))
+        .then(() => {
+          e.shadowRoot.querySelector(".clickable.add").dispatchEvent(
+            new Event("click"),
+          );
+
+          return assertWhen(
+            () => e.isAsyncConnected,
+            () =>
+              e.shadowRoot.querySelector("text.number").textContent === "43" &&
+              e.value === 43,
+          );
+        });
+    },
   ),
 );
 ```
